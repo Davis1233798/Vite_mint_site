@@ -1,30 +1,26 @@
 import {
-    Button,
-    Container,
-    Text,
-    Image,
-    Box,
-    Link,
+    Button, Container, Text,
+    Image, Box, Link,
     Skeleton,
 } from '@chakra-ui/react';
-import { ConnectButton, connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { useAccount, useContractRead, useContractWrite } from 'wagmi';
 import abiFile from './abiFile.json';
 import { motion } from 'framer-motion';
-import Navbar from '../components/Navbar';
 
-import { Routes, Route } from 'react-router-dom'
 
-let CONTRACT_ADDRESS = '0xFfEE4da57BAb36D71c096d1795666e53274aA96C';
+
+let CONTRACT_ADDRESS = '0xAa40bF9647f15787acCB97feCDA7219f1b97F8FD';
 CONTRACT_ADDRESS = CONTRACT_ADDRESS.toLowerCase();
 const getOpenSeaURL = (tokenId: string | number) =>
     //`https://goerli.pixxiti.com/nfts/${CONTRACT_ADDRESS}/${tokenId}`;
-    `https://testnets.opensea.io/assets/goerli/${CONTRACT_ADDRESS}/${tokenId}`;
+    `https://gateway.pinata.cloud/ipfs/QmYQG6c7BMdTQNk6n4kNJiYhpareb1pgCSrSGvXoe7qXmw/${tokenId}.png`;
 
 const blindURI = 'https://gateway.pinata.cloud/ipfs/Qmf8oauEnvxTG2zPdhrt2SFkfbXkBqNZKtBPedbM6SBAxm/0';
-
+const getImgURL = (tokenId: string | number) =>
+    //`https://goerli.pixxiti.com/nfts/${CONTRACT_ADDRESS}/${tokenId}`;
+    `https://gateway.pinata.cloud/ipfs/QmYQG6c7BMdTQNk6n4kNJiYhpareb1pgCSrSGvXoe7qXmw/${tokenId}.png`;
 
 function Erc721A() {
     const contractConfig = {
@@ -39,7 +35,7 @@ function Erc721A() {
 
     const { writeAsync: mint, error: mintError } = useContractWrite({
         ...contractConfig,
-        functionName: 'mint',
+        functionName: 'gift',
     });
     const [mintLoading, setMintLoading] = useState(false);
     const { address } = useAccount();
@@ -50,7 +46,7 @@ function Erc721A() {
         try {
             setMintLoading(true);
             const tx = await mint({
-                args: [address, { value: ethers.utils.parseEther('0.001') }],
+                args: [address, 1],
             });
             const receipt = await tx.wait();
             console.log('TX receipt', receipt);
@@ -74,13 +70,10 @@ function Erc721A() {
         })();
     }, [tokenURI]);
 
-
-
-
     return (
         <Container>
             <Text marginTop='4'>This is the NFT we will be minting!</Text>
-            {imgURL ? (
+            {mintedTokenId != 0 ? (
                 <Box
                     as={motion.div}
                     borderColor='gray.200'
@@ -93,7 +86,7 @@ function Erc721A() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                 >
-                    <Image src={imgURL} width='200px' />
+                    <Image src={getImgURL(mintedTokenId)} width='200px' />
                 </Box>
             ) : (
                 <Skeleton marginTop='4' width='250px' height='250px' rounded='lg' />

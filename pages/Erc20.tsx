@@ -1,9 +1,11 @@
-import React from 'react'
+import { useAccount } from 'wagmi'
 
-const Erc20 = () => {
-    return (
-        <div>Erc20</div>
-    )
+function App() {
+    const { address, isConnecting, isDisconnected } = useAccount()
+
+    if (isConnecting) return <div>Connecting…</div>
+    if (isDisconnected) return <div>Disconnected</div>
+    return <div>{address}</div>
 }
 
-export default Erc20
+export default App
