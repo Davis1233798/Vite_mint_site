@@ -3,13 +3,14 @@ import {
     Image, Box, Link,
     Skeleton,
 } from '@chakra-ui/react';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { useAccount, useContractRead, useContractWrite, useBalance, useFeeData } from 'wagmi';
 import abiFile from './abiFile.json';
 import { motion } from 'framer-motion';
 import ReactCardFlip from 'react-card-flip';
 import ConnectButton from '@rainbow-me/rainbowkit';
+import { Hexable } from 'ethers/lib/utils';
 
 let CONTRACT_ADDRESS = '0x1Fb2c456173B564AA2e37Cee8bCdB66CA55213cB';
 CONTRACT_ADDRESS = CONTRACT_ADDRESS.toLowerCase();
@@ -28,10 +29,7 @@ function Erc721A() {
         addressOrName: CONTRACT_ADDRESS,
         contractInterface: abiFile.abi,
     };
-    const { data: tokenURI } = useContractRead({
-        ...contractConfig,
-        functionName: 'commonTokenURI',
-    });
+
     const [imgURL, setImgURL] = useState('');
 
     const { writeAsync: mint, error: mintError } = useContractWrite({
@@ -43,11 +41,22 @@ function Erc721A() {
     const { address } = useAccount();
     const isConnected = !!address;
     const [mintedTokenId, setMintedTokenId] = useState(0);
-    const feeData = useFeeData({
-        onSuccess(data) {
-            console.log('Success', data)
-        },
-    })
+    // const feeData = useFeeData({
+    //     onSuccess(data) {
+    //         console.log('Success', data)
+    //     },
+    // })
+    const [totalMinted, setTotalMinted] = useState(0);
+    const { data: totalSupplyData } = useContractRead({
+        ...contractConfig,
+        functionName: 'totalSupply',
+        watch: true
+    });
+    useEffect(() => {
+        if (totalSupplyData) {
+            setTotalMinted(totalSupplyData.toNumber());
+        }
+    }, [totalSupplyData]);
 
 
 
@@ -68,25 +77,29 @@ function Erc721A() {
             setMintLoading(false);
         }
     };
-
-    useEffect(() => {
-        (async () => {
-            if (tokenURI) {
-                const res = await (await fetch(tokenURI as unknown as string)).json();
-                setImgURL(res.image);
-                setFlip(true);
-            }
-        })();
-    }, [tokenURI]);
-
+    const contractURL = (ADDRESS: string) => `https://goerli.etherscan.io/address/${ADDRESS}#code`;
     const [flip, setFlip] = useState(false);
+
 
     return (
         <Container>
 
             {/* <Text marginTop='4'>This is the NFT we will be minting!</Text> */}
-            <Link href='https://goerli.etherscan.io/address/${ContractAddress}'></Link>
+            {/* <Link as={'`https://goerli.etherscan.io/address/${ContractAddress}`'}>Contract</Link> */}
+            <Text marginTop='2'>
+                <Link
+                    isExternal
+                    href={contractURL(CONTRACT_ADDRESS)}
+                    color='blue'
+                    textDecoration='underline'
+                >
+                    Contract source code
+                </Link>
 
+            </Text>
+            <p style={{ margin: '12px 0 24px' }}>
+                {totalMinted} minted so far!
+            </p>
             <ReactCardFlip isFlipped={mintedTokenId == 0 ? flip : !flip}
                 flipDirection="horizontal">
                 <div style={{
@@ -122,7 +135,7 @@ function Erc721A() {
             </ReactCardFlip>
 
             <Button
-                disabled={!isConnected || mintLoading}
+                disabled={!isConnected || mintLoading || mintedTokenId != 0}
                 marginTop='6'
                 onClick={onMintClick}
                 textColor='white'
@@ -161,6 +174,7 @@ function Erc721A() {
                         >
                             here!
                         </Link>
+
                     </Text>
                 )
             }
