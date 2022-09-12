@@ -5,17 +5,18 @@ import {
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
-import { useAccount, useContractRead, useContractWrite } from 'wagmi';
+import { useAccount, useContractRead, useContractWrite, useBalance, useFeeData } from 'wagmi';
 import abiFile from './abiFile.json';
 import { motion } from 'framer-motion';
+import ReactCardFlip from 'react-card-flip';
+import ConnectButton from '@rainbow-me/rainbowkit';
 
-
-
-let CONTRACT_ADDRESS = '0xAa40bF9647f15787acCB97feCDA7219f1b97F8FD';
+let CONTRACT_ADDRESS = '0x1Fb2c456173B564AA2e37Cee8bCdB66CA55213cB';
 CONTRACT_ADDRESS = CONTRACT_ADDRESS.toLowerCase();
 const getOpenSeaURL = (tokenId: string | number) =>
-    //`https://goerli.pixxiti.com/nfts/${CONTRACT_ADDRESS}/${tokenId}`;
-    `https://gateway.pinata.cloud/ipfs/QmYQG6c7BMdTQNk6n4kNJiYhpareb1pgCSrSGvXoe7qXmw/${tokenId}.png`;
+    `https://goerli.pixxiti.com/nfts/${CONTRACT_ADDRESS}/${tokenId}`;
+//`https://gateway.pinata.cloud/ipfs/QmYQG6c7BMdTQNk6n4kNJiYhpareb1pgCSrSGvXoe7qXmw/${tokenId}.png`;
+const Contract_View = `https://goerli.etherscan.io/address/${CONTRACT_ADDRESS}`;
 
 const blindURI = 'https://gateway.pinata.cloud/ipfs/Qmf8oauEnvxTG2zPdhrt2SFkfbXkBqNZKtBPedbM6SBAxm/0';
 const getImgURL = (tokenId: string | number) =>
@@ -37,11 +38,19 @@ function Erc721A() {
         ...contractConfig,
         functionName: 'gift',
     });
+    //const balance = ConnectButton.Show
     const [mintLoading, setMintLoading] = useState(false);
     const { address } = useAccount();
     const isConnected = !!address;
     const [mintedTokenId, setMintedTokenId] = useState(0);
-    console.log(mintedTokenId);
+    const feeData = useFeeData({
+        onSuccess(data) {
+            console.log('Success', data)
+        },
+    })
+
+
+
     const onMintClick = async () => {
         try {
             setMintLoading(true);
@@ -65,42 +74,61 @@ function Erc721A() {
             if (tokenURI) {
                 const res = await (await fetch(tokenURI as unknown as string)).json();
                 setImgURL(res.image);
-                console.log(res.image);
+                setFlip(true);
             }
         })();
     }, [tokenURI]);
 
+    const [flip, setFlip] = useState(false);
+
     return (
         <Container>
-            <Text marginTop='4'>This is the NFT we will be minting!</Text>
-            {mintedTokenId != 0 ? (
-                <Box
-                    as={motion.div}
-                    borderColor='gray.200'
-                    borderWidth='1px'
-                    width='fit-content'
-                    marginTop='4'
-                    padding='6'
-                    shadow='md'
-                    rounded='lg'
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                >
-                    <Image src={getImgURL(mintedTokenId)} width='200px' />
-                </Box>
-            ) : (
-                <Skeleton marginTop='4' width='250px' height='250px' rounded='lg' />
-            )
-            }
+
+            {/* <Text marginTop='4'>This is the NFT we will be minting!</Text> */}
+            <Link href='https://goerli.etherscan.io/address/${ContractAddress}'></Link>
+
+            <ReactCardFlip isFlipped={mintedTokenId == 0 ? flip : !flip}
+                flipDirection="horizontal">
+                <div style={{
+                    width: '300px',
+                    height: '300px',
+                    background: '#d7fbda',
+                    fontSize: '40px',
+                    color: 'green',
+                    margin: '20px',
+                    borderRadius: '30px',
+                }}>
+                    <Image src={getImgURL(mintedTokenId)}
+                        width="100%"
+                        height="100%"
+                        borderRadius='30px'
+                    />
+                </div>
+                <div style={{
+                    width: '300px',
+                    height: '300px',
+                    background: '#fbd7f8',
+                    fontSize: '40px',
+                    color: 'blue',
+                    margin: '20px',
+                    borderRadius: '30px',
+                }}>
+                    <Image src={getImgURL(mintedTokenId)}
+                        width="100%"
+                        height="100%"
+                        borderRadius='30px'
+                    />
+                </div>
+            </ReactCardFlip>
 
             <Button
                 disabled={!isConnected || mintLoading}
                 marginTop='6'
                 onClick={onMintClick}
                 textColor='white'
-                bg='blue.500'
+                bg='linear-gradient(#e66465, #9198e5)'
                 _hover={{
-                    bg: 'blue.700',
+                    bg: 'linear-gradient(#de3e3f, #727ce0)',
                 }}
             >
                 {isConnected ? '🎉 Mint' : '🎉 Mint (Connect Wallet)'}
@@ -121,21 +149,23 @@ function Erc721A() {
             }
             {mintLoading && <Text marginTop='2'>Minting... please wait</Text>}
 
-            {(mintedTokenId == 0 ? '' : mintedTokenId) && (
-                <Text marginTop='2'>
-                    🥳 Mint successful! You can view your NFT{' '}
-                    <Link
-                        isExternal
-                        href={getOpenSeaURL(mintedTokenId)}
-                        color='blue'
-                        textDecoration='underline'
-                    >
+            {
+                (mintedTokenId == 0 ? '' : mintedTokenId) && (
+                    <Text marginTop='2'>
+                        🥳 Mint successful! You can view your NFT {' '}
+                        <Link
+                            isExternal
+                            href={getOpenSeaURL(mintedTokenId)}
+                            color='blue'
+                            textDecoration='underline'
+                        >
+                            here!
+                        </Link>
+                    </Text>
+                )
+            }
 
-                        here!
-                    </Link>
-                </Text>
-            )}
-        </Container>
+        </Container >
     )
 }
 
