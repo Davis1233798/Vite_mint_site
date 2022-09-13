@@ -1,7 +1,7 @@
 import {
     Button, Container, Text,
     Image, Box, Link,
-    Skeleton,
+    Skeleton,Flex,VStack,HStack,Spacer
 } from '@chakra-ui/react';
 import { BigNumber, ethers } from 'ethers';
 import { useEffect, useState } from 'react';
@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import ReactCardFlip from 'react-card-flip';
 import ConnectButton from '@rainbow-me/rainbowkit';
 import { Hexable } from 'ethers/lib/utils';
+import useAnimateNumber from 'use-animate-number';
 
 let CONTRACT_ADDRESS = '0x1Fb2c456173B564AA2e37Cee8bCdB66CA55213cB';
 CONTRACT_ADDRESS = CONTRACT_ADDRESS.toLowerCase();
@@ -40,7 +41,8 @@ function Erc721A() {
     const { address } = useAccount();
     const isConnected = !!address;
     const [mintedTokenId, setMintedTokenId] = useState(0);
-    const [totalMinted, setTotalMinted] = useState(0);
+    //const [totalMinted, setTotalMinted] = useState(0);
+    const [totalMinted, setTotalMinted] = useAnimateNumber(0);
     const { data: totalSupplyData } = useContractRead({
         ...contractConfig,
         functionName: 'totalSupply',
@@ -70,36 +72,31 @@ function Erc721A() {
     };
     const contractURL = (ADDRESS: string) => `https://goerli.etherscan.io/address/${ADDRESS}#code`;
     const [flip, setFlip] = useState(false);
-
+    
 
     return (
-        <Container>
+        <Container maxW='900px' p={0}>
+        <Flex h="100vh" >
+            <VStack
+            w='50%'
+            h='full'
+            p={5}
+            alignItems="flex-start">
 
             {/* <Text marginTop='4'>This is the NFT we will be minting!</Text> */}
             {/* <Link as={'`https://goerli.etherscan.io/address/${ContractAddress}`'}>Contract</Link> */}
-            <Text marginTop='2'>
-                <Link
-                    isExternal
-                    href={contractURL(CONTRACT_ADDRESS)}
-                    color='blue'
-                    textDecoration='underline'
-                >
-                    Contract source code
-                </Link>
-
-            </Text>
-            <p style={{ margin: '12px 0 24px' }}>
-                {totalMinted} minted so far!
+            <p style={{ margin: '0 0 5px' }}>
+                Total Erc721A NFT Minted :{totalMinted} 
             </p>
             <ReactCardFlip isFlipped={mintedTokenId == 0 ? flip : !flip}
                 flipDirection="horizontal">
                 <div style={{
-                    width: '300px',
-                    height: '300px',
+                    // width: '300px',
+                    // height: '300px',
                     background: '#d7fbda',
-                    fontSize: '40px',
+                    // fontSize: '40px',
                     color: 'green',
-                    margin: '20px',
+
                     borderRadius: '30px',
                 }}>
                     <Image src={getImgURL(mintedTokenId)}
@@ -109,12 +106,12 @@ function Erc721A() {
                     />
                 </div>
                 <div style={{
-                    width: '300px',
-                    height: '300px',
+                    // width: '300px',
+                    // height: '300px',
                     background: '#fbd7f8',
-                    fontSize: '40px',
+                    // fontSize: '40px',
                     color: 'blue',
-                    margin: '20px',
+                    // margin: '20px',
                     borderRadius: '30px',
                 }}>
                     <Image src={getImgURL(mintedTokenId)}
@@ -124,7 +121,20 @@ function Erc721A() {
                     />
                 </div>
             </ReactCardFlip>
+            </VStack>
+            <Spacer />
+            <VStack>
+            <Text>
+                <Link
+                    isExternal
+                    href={contractURL(CONTRACT_ADDRESS)}
+                    color='blue'
+                    textDecoration='underline'
+                >
+                    <Button>Contract source code</Button>
+                </Link>
 
+            </Text>
             <Button
                 disabled={!isConnected || mintLoading || mintedTokenId != 0}
                 marginTop='6'
@@ -137,6 +147,7 @@ function Erc721A() {
             >
                 {isConnected ? '🎉 Mint' : '🎉 Mint (Connect Wallet)'}
             </Button>
+            
 
             {
                 mintError && (
@@ -147,7 +158,7 @@ function Erc721A() {
             {
                 mintError && (
                     <pre style={{ marginTop: '8px', color: 'red' }}>
-                        <code>{JSON.stringify(mintError, null, ' ')}</code>
+                        <code>{JSON.stringify(mintError.message, null, ' ')}</code>
                     </pre>
                 )
             }
@@ -169,8 +180,10 @@ function Erc721A() {
                     </Text>
                 )
             }
+            </VStack>
 
-        </Container >
+        </Flex> 
+    </Container >
     )
 }
 
