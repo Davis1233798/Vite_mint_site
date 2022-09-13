@@ -36,16 +36,10 @@ function Erc721A() {
         ...contractConfig,
         functionName: 'gift',
     });
-    //const balance = ConnectButton.Show
     const [mintLoading, setMintLoading] = useState(false);
     const { address } = useAccount();
     const isConnected = !!address;
     const [mintedTokenId, setMintedTokenId] = useState(0);
-    // const feeData = useFeeData({
-    //     onSuccess(data) {
-    //         console.log('Success', data)
-    //     },
-    // })
     const [totalMinted, setTotalMinted] = useState(0);
     const { data: totalSupplyData } = useContractRead({
         ...contractConfig,
@@ -57,9 +51,6 @@ function Erc721A() {
             setTotalMinted(totalSupplyData.toNumber());
         }
     }, [totalSupplyData]);
-
-
-
     const onMintClick = async () => {
         try {
             setMintLoading(true);

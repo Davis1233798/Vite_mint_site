@@ -1,53 +1,56 @@
-
-import {
-    Navbar as NavbarBS,
-    Container,
-    Nav,
-    NavDropdown
-} from 'react-bootstrap';
-import { Image } from '@chakra-ui/react';
-import { Routes, Route, Link } from "react-router-dom";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import Logo from "./Logo"
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Image } from "react-bootstrap";
 
-const Navbar = () => {
+
+function NavBar() {
     return (
-        <>
-            <NavbarBS>
-                <Container>
-                    <Image
+        <Navbar bg="light" expand="lg">
+            <Container fluid>
+                <Navbar.Brand href="#">
+                 <Image
                         style={{ borderRadius: '500px' }}
                         src={`https://opensea.mypinata.cloud/ipfs/QmfPC9jKTBUuqybsvExPswhx42hbL9QwFtqczKS6S9nBx7`}
                         width={50}
                         height={50}
                     />
-                </Container>
-                <NavbarBS.Toggle aria-controls="basic-navbar-nav" />
-                <NavbarBS.Collapse id="basic-navbar-nav">
-                    <Nav>
-                        <Nav>
-                            <Link to="/">Home</Link>
-                        </Nav>
-                        <Nav>
-                            <Link to="/20">Tokens</Link></Nav>
-                        <Nav>
-                            <Link to="/721A">Liquidity Pools</Link></Nav>
-                        <NavDropdown title="NFTs" id="basic-nav-dropdown">
-                            <NavDropdown.Item title="ERC-1155 series" id="basic-nav-dropdown" >ERC-1155</NavDropdown.Item>
+                    </Navbar.Brand>
+                <Navbar.Toggle aria-controls="navbarScroll" />
+                <Navbar.Collapse id="navbarScroll">
+                    <Nav
+                        className="me-auto my-2 my-lg-0"
+                        style={{ maxHeight: '100px' }}
+                        navbarScroll
+                    >
+                        <Nav.Link href="/">Home</Nav.Link>
+                        <NavDropdown title="Tokens" id="navbarScrollingDropdown">
+                            <NavDropdown.Item href="/20">Erc20</NavDropdown.Item>
+                            <NavDropdown.Item href="/677">Erc677</NavDropdown.Item>
+                            {/*<NavDropdown.Divider />
+                             <NavDropdown.Item href="#action5">
+                                Something else here
+                            </NavDropdown.Item> */}
+                        </NavDropdown>
+                      <NavDropdown title="Nfts" id="navbarScrollingDropdown">
+                            <NavDropdown.Item href="/721">Erc721</NavDropdown.Item>
+                            <NavDropdown.Item href="/721A">Erc721A</NavDropdown.Item>
+                            <NavDropdown.Item href="/721R">Erc721R</NavDropdown.Item>
+                            <NavDropdown.Item href="/721Z">Erc721Z</NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item href="#action/3.1">ERC-721 A</NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.2">
-                                ERC-721 R
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.3">ERC-721 Z</NavDropdown.Item>
+                             <NavDropdown.Item href="/Erc1155">Erc1155</NavDropdown.Item> 
                         </NavDropdown>
                     </Nav>
                     <ConnectButton />
-                </NavbarBS.Collapse>
-            </NavbarBS >
-        </>
-    )
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
+    );
 }
 
-export default Navbar
+export default NavBar;
