@@ -86,7 +86,7 @@ function Erc721A() {
             {/* <Text marginTop='4'>This is the NFT we will be minting!</Text> */}
             {/* <Link as={'`https://goerli.etherscan.io/address/${ContractAddress}`'}>Contract</Link> */}
             <p style={{ margin: '0 0 5px' }}>
-                Total Erc721A NFT Minted :{totalMinted} 
+                Total Erc721A NFT Minted :－{totalMinted} 
             </p>
             <ReactCardFlip isFlipped={mintedTokenId == 0 ? flip : !flip}
                 flipDirection="horizontal">
