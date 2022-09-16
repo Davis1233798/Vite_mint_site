@@ -50,7 +50,7 @@ function Erc721A() {
     });
     useEffect(() => {
         if (totalSupplyData) {
-            setTotalMinted(totalSupplyData.toNumber());
+            setTotalMinted(totalSupplyData.toNumber(),true);
         }
     }, [totalSupplyData]);
     const onMintClick = async () => {
